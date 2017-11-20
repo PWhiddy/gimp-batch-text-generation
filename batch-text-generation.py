@@ -9,7 +9,7 @@ def get_valid_filename(s):
     s = str(s).strip().replace(' ', '_')
     return re.sub(r'(?u)[^-\w.]', '', s)
 
-def generate_images(template_path, text_path, font, size, color, output_path) :
+def generate_images(template_path, text_path, font, size, color, output_path):
 
     file = open(text_path)
     text = file.read()
@@ -33,6 +33,8 @@ def generate_images(template_path, text_path, font, size, color, output_path) :
         # Create a new text layer (-1 for the layer means create a new layer)
         layer = pdb.gimp_text_fontname(img, None, 0, 0, line, 10,
                                        True, size, PIXELS, font)
+
+        layer.translate(img.width/2-layer.width/2, img.height/2-layer.height/2)
 
         # Resize the image to the size of the layer
         #img.resize(layer.width, layer.height, 0, 0)
