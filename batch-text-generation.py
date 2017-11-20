@@ -9,7 +9,8 @@ def get_valid_filename(s):
     s = str(s).strip().replace(' ', '_')
     return re.sub(r'(?u)[^-\w.]', '', s)
 
-def generate_images(template_path, text_path, font, size, color, output_path):
+def generate_images(template_path, text_path, font, 
+    x_center, y_center, size, color, output_path):
 
     file = open(text_path)
     text = file.read()
@@ -30,11 +31,16 @@ def generate_images(template_path, text_path, font, size, color, output_path):
         # Set the text color
         gimp.set_foreground(color)
 
-        # Create a new text layer (-1 for the layer means create a new layer)
-        layer = pdb.gimp_text_fontname(img, None, 0, 0, line, 10,
-                                       True, size, PIXELS, font)
+        words = line.split(' ')
 
-        layer.translate(img.width/2-layer.width/2, img.height/2-layer.height/2)
+        for word,idx in zip(words,range(len(words))):
+
+            # Create a new text layer (-1 for the layer means create a new layer)
+            layer = pdb.gimp_text_fontname(img, None, 0, 0, word, 10,
+                                           True, size, PIXELS, font)
+
+            layer.translate(int(0.5*(img.width-layer.width)+x_center), 
+                            int(0.5*(img.height-layer.height)+y_center+100*idx))
 
         # Resize the image to the size of the layer
         #img.resize(layer.width, layer.height, 0, 0)
@@ -66,6 +72,8 @@ register(
         (PF_STRING, "source", "Template Image", "/some/path/image.png"),
         (PF_STRING, "string", "Source Text", '/path/file.txt'),
         (PF_FONT, "font", "Font face", "Sans"),
+        (PF_SPINNER, "x", "X Offset", 0, (-50000, 50000, 1)),
+        (PF_SPINNER, "y", "Y Offset", 0, (-50000, 50000, 1)),
         (PF_SPINNER, "size", "Font size", 50, (1, 3000, 1)),
         (PF_COLOR, "color", "Text color", (1.0, 0.0, 0.0)),
         (PF_STRING, "destination", "Output Destination", "/path/dir/")
